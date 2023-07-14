@@ -51,15 +51,59 @@ View(ufo.data3)
 
 # To create a table finding hoax per country
 # First, find total number of hoax. This will act as our denominator
-hoax_total <- sum(ufo.data3$is_Hoax == TRUE)
-# Then, find the subset of each country where hoax = True
-au_hoax <- (sum(ufo.data3$country == trimws("au") & ufo.data3$is_Hoax == TRUE))/ hoax_total * 100 # Divide each by the total number of hoax
-us_hoax <- (sum(ufo.data3$country == trimws("us") & ufo.data3$is_Hoax == TRUE))/ hoax_total * 100
-ca_hoax <- (sum(ufo.data3$country == trimws("ca") & ufo.data3$is_Hoax == TRUE))/ hoax_total * 100
-de_hoax <- (sum(ufo.data3$country == trimws("de") & ufo.data3$is_Hoax == TRUE))/ hoax_total * 100
-gb_hoax <- (sum(ufo.data3$country == trimws("gb") & ufo.data3$is_Hoax == TRUE))/ hoax_total * 100
+# Load the dplyr package if you haven't already
+library(dplyr)
+hoax_total <- ufo.data3 %>%
+  filter(is_Hoax == TRUE) %>%
+  summarize(total = n())
 
-# Table reporting hoax per country
-hoax_per_country <- data.frame(au_hoax, us_hoax, ca_hoax, de_hoax, gb_hoax)
-View(hoax_per_country)
+# Use pipes to simplify navigating through different groups
+percent_hoax_per_country <- ufo.data3 %>%
+  group_by(country) %>% # group each country together to identify how many hoax / country
+  summarize(hoax_count = sum(is_Hoax == TRUE)) %>%
+  mutate(percent_hoax = hoax_count / hoax_total$total * 100) # divide hoax count per country by the total amount of hoaxes
+# View the table reporting hoax per country
+View(percent_hoax_per_country)
 
+
+# Add another column to the dataset (report_delay) 
+# populate with the time difference in days, between the date of the sighting and the date it was reported.
+# I do this by subtracting 
+ufo.data4 <- ufo.data3
+ufo.data4$report_delay <- as.numeric(difftime(ufo.data3$date_posted, ufo.data3$datetime, units = "days"))
+# Populate this information into a table
+View(ufo.data4)
+
+# Remove the rows where the sighting was reported before it happened.
+ufo.data5 <- ufo.data4[!ufo.data4$report_delay <0, ] # to do this, I can remove any negative value acquired in the difference of dates
+View(ufo.data5)
+
+# Report average delay per country
+# To do this we will need some functions from the dplyr package. 
+# If you do not already have this loaded, use the function below
+library(dplyr)
+
+country_delay <- ufo.data5 %>%
+  group_by(country) %>%
+  summarize(report_delay = mean(report_delay))
+
+# Populate this information into a table
+View(country_delay)
+
+# Review and edit the duration seconds column
+
+# Formatting is different between identical values (ie. 2 vs 2.0)
+# To fix, I made sure all values are reported to 2 decimal places
+ufo.data5$duration.seconds <- format(ufo.data5$duration.seconds, nsmall = 2)
+View(ufo.data5)
+
+# Create a histogram using the duration seconds column
+# First, I make sure the column is numeric
+ufo.data6 <- ufo.data5
+duration_numeric <- (as.numeric(ufo.data6$duration.seconds))
+
+# Create histogram and add title 
+hist(duration_numeric, main = paste("Duration of UFO Sitings"))
+
+# add 'log' base 10 to better view the distribution 
+hist(log(duration_numeric), main = paste("Duration of UFO Sitings"))
