@@ -11,3 +11,19 @@ Encoding: UTF-8
 
 RnwWeave: Sweave
 LaTeX: pdfLaTeX
+
+# Assignment 4
+# R Coding
+# Caroline Rodrigues
+
+# Save ufo data file to your working directory
+# Visually inspect and compare your data frame to the original csv 
+ufo.data <- read.csv("ufo_subset.csv")
+View(ufo.data)
+
+# Find rows where shape information is missing and enter "unknown"
+missing_shape <- which(ufo.data$shape =="")
+ufo.data$shape[missing_shape] <- "unknown"
+# Check to see if this worked
+View(ufo.data)
+# This worked! 
