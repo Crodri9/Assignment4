@@ -48,3 +48,18 @@ ufo.data3 <- ufo.data2
 ufo.data3$is_Hoax <- grepl("\\bhoax\\b", ufo.data2$comment, ignore.case = TRUE)
 View(ufo.data3)
 
+
+# To create a table finding hoax per country
+# First, find total number of hoax. This will act as our denominator
+hoax_total <- sum(ufo.data3$is_Hoax == TRUE)
+# Then, find the subset of each country where hoax = True
+au_hoax <- (sum(ufo.data3$country == trimws("au") & ufo.data3$is_Hoax == TRUE))/ hoax_total * 100 # Divide each by the total number of hoax
+us_hoax <- (sum(ufo.data3$country == trimws("us") & ufo.data3$is_Hoax == TRUE))/ hoax_total * 100
+ca_hoax <- (sum(ufo.data3$country == trimws("ca") & ufo.data3$is_Hoax == TRUE))/ hoax_total * 100
+de_hoax <- (sum(ufo.data3$country == trimws("de") & ufo.data3$is_Hoax == TRUE))/ hoax_total * 100
+gb_hoax <- (sum(ufo.data3$country == trimws("gb") & ufo.data3$is_Hoax == TRUE))/ hoax_total * 100
+
+# Table reporting hoax per country
+hoax_per_country <- data.frame(au_hoax, us_hoax, ca_hoax, de_hoax, gb_hoax)
+View(hoax_per_country)
+
