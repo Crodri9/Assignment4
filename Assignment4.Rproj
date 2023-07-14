@@ -27,3 +27,15 @@ ufo.data$shape[missing_shape] <- "unknown"
 # Check to see if this worked
 View(ufo.data)
 # This worked! 
+
+
+
+# Remove the rows that do not have Country information
+ufo.data1 <- ufo.data[!ufo.data$country == "", ]
+View(ufo.data1)
+
+# Convert Datetime and Date_posted columns into appropriate formats
+# I have chosen to keep formats consistent to Y-m-d
+ufo.data2 <- ufo.data1
+ufo.data2$date_posted <- as.Date(ufo.data1$date_posted, format = "%d-%m-%Y")
+View(ufo.data2)
